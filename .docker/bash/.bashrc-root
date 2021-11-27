@@ -1,0 +1,7 @@
+export HISTFILE=~/bash/.bash_root_history
+touch $HISTFILE
+HISTSIZE=
+HISTFILESIZE=
+export HISTCONTROL=ignoreboth:erasedups
+
+export PS1="\[\e[31m\]\u\[\e[m\] \[\e[37m\]\w\[\e[m\]\[\e[31m\]\\$\[\e[m\] "

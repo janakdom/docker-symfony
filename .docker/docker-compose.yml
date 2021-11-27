@@ -23,6 +23,8 @@ services:
         - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
         - ./bash/.bashrc:/home/${COMPOSE_USER}/.bashrc
         - ./bash:/home/${COMPOSE_USER}/bash
+        - ./bash/.bashrc-root:/root/.bashrc
+        - ./bash:/root/bash
       depends_on:
         - mysql
       networks:

@@ -14,8 +14,7 @@ OPENSSL_BIN:=$(shell which openssl)
 INTERACTIVE=
 #INTERACTIVE=-T
 
-default:
-	down build up-daemon
+default: down build up-daemon
 
 clean:
 	docker system prune
@@ -40,10 +39,10 @@ restart: stop start
 bash:
 	@docker-compose $(PROJECT) exec $(INTERACTIVE) -u $(SYSTEM_USERNAME) symfony bash
 
-bash-root:
+root:
 	@docker-compose $(PROJECT) exec $(INTERACTIVE) -u root symfony bash
 
-bash-mysql:
+mysql:
 	@docker-compose $(PROJECT) exec mysql bash
 
 exec:
@@ -94,8 +93,7 @@ migration:
 migrate:
 	@make -s exec cmd="${CONSOLE_BIN} doctrine:migrations:migrate --no-interaction --all-or-nothing"
 
-migration-all:
-	migration migrate
+migration-all: migration migrate
 
 fixtures:
 	@make -s exec cmd="${CONSOLE_BIN} doctrine:fixtures:load"
