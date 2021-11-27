@@ -11,6 +11,7 @@ ARG COMPOSE_PROJECT_NAME
 ARG GID=1000
 ARG USERNAME
 ARG ROOT_PASSWORD
+ARG USER_PASSWORD
 ARG UID=1000
 
 # check environment
@@ -27,6 +28,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y \
       procps \
       nano \
       git \
+#      zsh
       mc \
       unzip \
       libicu-dev \
@@ -86,6 +88,7 @@ RUN mkdir -p /home/$USERNAME/.ssh \
     && ssh-keyscan -H gitlab.com >> /home/$USERNAME/.ssh/known_hosts
 
 RUN echo "root:${ROOT_PASSWORD}" | chpasswd
+RUN echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
 
 # put apache and php config for Symfony, enable sites
 COPY ./apache2/apache2.conf /etc/apache2/apache2.conf
@@ -98,6 +101,11 @@ COPY ./php/php.$BUILD_ARGUMENT_ENV.ini /usr/local/etc/php/php.ini
 # enable apache modules
 RUN a2enmod rewrite
 RUN a2enmod ssl
+
+
+#RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git /home/$USERNAME/powerlevel10k
+#RUN echo "source /home/$USERNAME/powerlevel10k/powerlevel10k.zsh-theme" >>/home/$USERNAME/.zshrc
+#RUN chmod 777 /home/$USERNAME/.zshrc
 
 # install local-php-security-checker
 RUN curl -s https://api.github.com/repos/fabpot/local-php-security-checker/releases/latest | \
@@ -137,7 +145,7 @@ RUN if [ "$BUILD_ARGUMENT_ENV" = "dev" ] || [ "$BUILD_ARGUMENT_ENV" = "test" ]; 
 
 # generate certificates
 # TODO: change it and make additional logic for production environment
-RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-cert-snakeoil.key -out /etc/ssl/certs/ssl-cert-snakeoil.pem -subj "/C=CZ/ST=Prague/L=Prague/O=Security/OU=Development/CN=dominikjanak.loc"
+RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/ssl-cert-snakeoil.key -out /etc/ssl/certs/ssl-cert-snakeoil.pem -subj "/C=CZ/ST=Prague/L=Prague/O=Security/OU=Development/CN=localhost"
 
 # MC conf
 RUN mkdir -p echo /root/.config/mc/; \

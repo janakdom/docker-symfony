@@ -12,6 +12,7 @@ services:
           - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
           - USERNAME=${COMPOSE_USER}
           - ROOT_PASSWORD=${ROOT_PASSWORD}
+          - USER_PASSWORD=${USER_PASSWORD}
         dockerfile: ./Dockerfile
       container_name: ${COMPOSE_PROJECT_NAME}_web
       ports:
@@ -67,6 +68,9 @@ services:
       environment:
         MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
         PMA_HOST: ${COMPOSE_PROJECT_NAME}_db
+        PMA_CONTROLUSER: pma
+        PMA_CONTROLPASS: passwd123
+        PMA_PMADB: phpmyadmin
       networks:
         - symfony
 

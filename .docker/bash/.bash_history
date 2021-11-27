@@ -1,5 +1,5 @@
 composer install
 composer update
-
-sudo mc
-ls
+bin/console make:migration
+bin/console doctrine:migrations:migrate
+bin/console doctrine:fixtures:load

@@ -16,11 +16,10 @@ INTERACTIVE=
 
 default: down build up-daemon
 
-clean:
-	docker system prune
-
 clean-all:
-	docker system prune -a
+	docker system prune -a -f
+
+rebuild: down clean-all build up-daemon bash
 
 build:
 	@docker-compose -f ./.docker/docker-compose.yml build
@@ -44,6 +43,9 @@ root:
 
 mysql:
 	@docker-compose $(PROJECT) exec mysql bash
+
+pma:
+	@docker-compose $(PROJECT) exec phpmyadmin bash
 
 exec:
 	@docker-compose $(PROJECT) exec $(INTERACTIVE) -u $(SYSTEM_USERNAME) symfony $$cmd
