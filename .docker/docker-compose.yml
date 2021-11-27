@@ -1,0 +1,82 @@
+version: '3.5'
+
+services:
+
+    symfony:
+      image: ${COMPOSE_PROJECT_NAME}_web:latest
+      build:
+        context: .
+        args:
+          - "BUILD_ARGUMENT_ENV=dev"
+          - "BUILD_ARGUMENT_DEBUG_ENABLED=false"
+          - COMPOSE_PROJECT_NAME=${COMPOSE_PROJECT_NAME}
+          - USERNAME=${COMPOSE_USER}
+          - ROOT_PASSWORD=${ROOT_PASSWORD}
+        dockerfile: ./Dockerfile
+      container_name: ${COMPOSE_PROJECT_NAME}_web
+      ports:
+        - 8080:80
+        - 8081:443
+      volumes:
+        - ..:/app
+        - ../../_packages:/_packages
+        - ./php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+        - ./bash/.bashrc:/home/${COMPOSE_USER}/.bashrc
+        - ./bash:/home/${COMPOSE_USER}/bash
+      depends_on:
+        - mysql
+      networks:
+        - symfony
+      restart: always
+
+    ### Cron tasks, RabbitMQ consumers
+    #supervisord:
+      #<<: *symfony-template
+      #container_name: ${COMPOSE_PROJECT_NAME}_supervisord
+      #expose: []
+      #ports: []
+      #command: ["/usr/bin/supervisord"]
+
+    mysql:
+      image: mariadb
+      container_name: ${COMPOSE_PROJECT_NAME}_db
+      command: --default-authentication-plugin=mysql_native_password
+      environment:
+        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+        MYSQL_USER: ${DB_USER_NAME}
+        MYSQL_PASSWORD: ${DB_USER_PASS}
+      ports:
+        - 33061:3306
+      volumes:
+        - ./../var/mysql-data:/var/lib/mysql
+        - ./db/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      networks:
+        - symfony
+      restart: always
+
+    phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      container_name: ${COMPOSE_PROJECT_NAME}_pma
+      ports:
+        - "8082:80"
+      restart: always
+      depends_on:
+        - mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+        PMA_HOST: ${COMPOSE_PROJECT_NAME}_db
+      networks:
+        - symfony
+
+
+    mailhog:
+      container_name: ${COMPOSE_PROJECT_NAME}_mailhog
+      image: mailhog/mailhog
+      ports:
+        - 1026:1025 # smtp server
+        - 8026:8025 # web ui
+      restart: always
+
+networks:
+  symfony:
+    name: ${COMPOSE_PROJECT_NAME}_network

@@ -1,0 +1,18 @@
+### User-specific stuff:
+/.git*
+/.idea*
+.dockerignore
+.editorconfig
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.*.local
+/.env.local.php
+/public/bundles/
+/var/mysql-data
+/vendor/
+###< symfony/framework-bundle ###
+
+### Docker
+Dockerfile
+docker-compose.yml
